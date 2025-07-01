@@ -38,8 +38,7 @@ public class VideoManager {
     // Function to print details of a single video
     public static void printVideo(Video video) {
         System.out.println("--------------------");
-        System.out.println("Video Title: >> " + video.getTitle()); // Modified for feature-x
-        System.out.println("Title of Video: " + video.getTitle()); // Modified for feature-y
+        System.out.println("Name of Video: " + video.getTitle()); // Modified for feature-z
         System.out.println("Link: " + video.getLink());
     }
 
