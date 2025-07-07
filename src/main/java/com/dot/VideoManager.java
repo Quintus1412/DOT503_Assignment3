@@ -11,10 +11,8 @@ import java.util.Scanner;
 
 public class VideoManager {
 
-    private static Scanner scanner = new Scanner(System.in); // Use a single scanner for input
-
     // Function to read details for a single video from user input
-    public static Video readVideo() {
+    public static Video readVideo(Scanner scanner) { // Added Scanner parameter
         System.out.print("Enter video title: ");
         String title = scanner.nextLine();
         System.out.print("Enter video link: ");
@@ -23,13 +21,13 @@ public class VideoManager {
     }
 
     // Function to add new videos to the list
-    public static void addNewVideos(List<Video> videos) {
+    public static void addNewVideos(List<Video> videos, Scanner scanner) { // Added Scanner parameter
         System.out.print("How many new videos to add? ");
-        int totalNewVideos = Integer.parseInt(scanner.nextLine()); // Read int using nextLine() then parse
+        int totalNewVideos = Integer.parseInt(scanner.nextLine());
 
         for (int i = 0; i < totalNewVideos; i++) {
             System.out.println("--- Enter details for Video " + (videos.size() + 1) + " ---");
-            Video vid = readVideo();
+            Video vid = readVideo(scanner); // Pass the scanner to readVideo()
             videos.add(vid);
         }
         System.out.println(totalNewVideos + " video(s) added successfully.");
@@ -131,48 +129,56 @@ public class VideoManager {
     }
 
     public static void main(String[] args) {
-        List<Video> videos = readVideosFromTxt(); // Load existing videos at startup
-
-        while (true) {
-            displayMenu();
-            System.out.print("Enter your choice (1-5): ");
-            String choiceStr = scanner.nextLine(); // Read choice as String
-
-            try {
-                int choice = Integer.parseInt(choiceStr);
-
-                switch (choice) {
-                    case 1:
-                        addNewVideos(videos);
-                        break;
-                    case 2:
-                        printVideos(videos);
-                        break;
-                    case 3:
-                        writeVideosToTxt(videos);
-                        break;
-                    case 4:
-                        if (!videos.isEmpty()) {
-                            System.out.print("Loading will overwrite current unsaved videos. Continue? (y/n): ");
-                            String confirm = scanner.nextLine().toLowerCase();
-                            if (!confirm.equals("y")) {
-                                System.out.println("Load cancelled.");
-                                continue;
+        List<Video> videos = new ArrayList<>();
+        // Create a local scanner for the main method's input
+        try (Scanner scanner = new Scanner(System.in)) { // New: Scanner created here and will be auto-closed
+            while (true) {
+                displayMenu();
+                System.out.print("Enter your choice: ");
+                try {
+                    int choice = Integer.parseInt(scanner.nextLine());
+                    switch (choice) {
+                        case 1:
+                            addNewVideos(videos, scanner); // Pass scanner to addNewVideos
+                            break;
+                        case 2:
+                            if (videos.isEmpty()) {
+                                System.out.println("No videos to display. Please add some first.");
+                            } else {
+                                printVideos(videos);
                             }
-                        }
-                        videos = readVideosFromTxt(); // Update the current list
-                        break;
-                    case 5:
-                        System.out.println("Exiting Video Manager. Goodbye!");
-                        scanner.close(); // Close the scanner before exiting
-                        return; // Exit the main method
-                    default:
-                        System.out.println("Invalid choice. Please enter a number between 1 and 5.");
+                            break;
+                        case 3:
+                            if (videos.isEmpty()) {
+                                System.out.println("No videos to save. Please add some first.");
+                            } else {
+                                writeVideosToTxt(videos);
+                                System.out.println("Videos saved to data.txt.");
+                            }
+                            break;
+                        case 4:
+                            if (!videos.isEmpty()) {
+                                System.out.print("Loading will overwrite current unsaved videos. Continue? (y/n): ");
+                                String confirm = scanner.nextLine().toLowerCase();
+                                if (!confirm.equals("y")) {
+                                    System.out.println("Load cancelled.");
+                                    continue;
+                                }
+                            }
+                            videos = readVideosFromTxt(); // This still reads from file, no scanner needed
+                            System.out.println("Videos loaded from data.txt.");
+                            break;
+                        case 5:
+                            System.out.println("Exiting Video Manager. Goodbye!");
+                            return; // Exit the main method
+                        default:
+                            System.out.println("Invalid choice. Please enter a number between 1 and 5.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a number.");
                 }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
             }
-        }
+        } // Scanner will be automatically closed here by try-with-resources
     }
     // New helper methods added for testability (as per unit testing guide)
     public static Video createVideo(String title, String link) {
