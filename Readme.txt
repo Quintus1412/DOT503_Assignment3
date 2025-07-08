@@ -55,7 +55,7 @@ This project includes JUnit 5 unit tests located in the `src/test/java/com/dot/`
         * `testAddVideo`: Checks successful video addition and property storage.
         * `testDisplayVideos`: Verifies correct retrieval and presentation of added videos.
         * `testSaveAndLoadVideos`: Confirms accurate data persistence (writing to and loading from `data.txt`).
-    * **Test Scenarios (Intentional Failures): 3 tests
+    * **Test Scenarios (Intentional Failures): 2 tests
         * `testVideoTitleEqualityFails`: Deliberately asserts a video's actual title is equal to an incorrect title, causing a failure.
         * `testReadVideoFromEmptyFileFails`: Intentionally attempts to read a video from an empty/invalid source and asserts the result is not null, causing a failure if null is correctly returned.
 
