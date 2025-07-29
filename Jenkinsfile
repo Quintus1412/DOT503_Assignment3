@@ -22,7 +22,7 @@ pipeline {
                 // Cleans up the workspace before checkout (good practice)
                 cleanWs()
                 // Checks out the source code from the configured SCM (Git)
-                git branch: 'main', url: 'https://github.com/Quintus1412/DOT503_Assigment2.git'
+                git branch: 'main'
             }
         }
 
