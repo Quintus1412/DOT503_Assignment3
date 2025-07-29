@@ -22,7 +22,7 @@ pipeline {
                 // Cleans up the workspace before checkout (good practice)
                 cleanWs()
                 // Checks out the source code from the configured SCM (Git)
-                git branch: 'main'
+                checkout scm // Use the SCM configuration defined in the Jenkins job
             }
         }
 
