@@ -22,11 +22,6 @@ class VideoManagerTest {
     void setUp() {
         testOut = new ByteArrayOutputStream();
         System.setOut(new PrintStream(testOut));
-        // Reset scanner for each test if VideoManager uses it directly
-        // This might require modifying VideoManager to accept a Scanner in its methods or constructor
-        // For simplicity in testing, we will mock System.in/out directly.
-        // Ensure the scanner in VideoManager is initialized only once or closed/reopened carefully.
-        // If VideoManager's scanner is static, consider adding a reset method if needed.
     }
 
     // Helper to set mock input
@@ -52,25 +47,19 @@ class VideoManagerTest {
         List<Video> videos = new ArrayList<>();
         int initialSize = videos.size();
 
-        // Simulate user input for one video
-        // The first line is for "How many new videos?", the subsequent lines are for video details
         String input = "1\nTest Video 1\nhttp://link1.com\n";
-        provideInput(input); // Set mock input
-
-        // Create a Scanner that reads from our mocked System.in
-        // This Scanner will be local to the test method and closed implicitly by the JVM
+        provideInput(input);
         Scanner testScanner = new Scanner(System.in);
         try {
-            VideoManager.addNewVideos(videos, testScanner); // Pass the testScanner
+            VideoManager.addNewVideos(videos, testScanner);
         } finally {
-            testScanner.close(); // Important: Close the test scanner
-            System.setIn(systemIn); // Restore original System.in
+            testScanner.close();
+            System.setIn(systemIn);
         }
 
         assertEquals(initialSize + 1, videos.size(), "List size should increase by 1");
         assertEquals("Test Video 1", videos.get(0).getTitle(), "Added video title should be correct");
     }
-
 
     @Test
     @DisplayName("Test 3: getVideosCount returns correct number of videos")
@@ -83,30 +72,28 @@ class VideoManagerTest {
         assertEquals(0, VideoManager.getVideosCount(videos), "Should return 0 for an empty list");
     }
 
-
-    // --- Failing Test Cases (2) ---
+    // --- Corrected Passing Test Cases (2) ---
 
     @Test
-    @DisplayName("Test 4 (Failing): Read video from empty file - expects non-null but gets null")
-    void testReadVideoFromEmptyFileFails() throws IOException {
-        // Create an empty mock file content
+    @DisplayName("Test 4 (Corrected): Read video from empty file returns null")
+    void testReadVideoFromEmptyFileReturnsNull() throws IOException {
         String emptyFileContent = "";
         BufferedReader reader = new BufferedReader(new StringReader(emptyFileContent));
 
-        // This should return null if the file is empty or corrupted (as per VideoManager logic for totalLine)
-        // We expect it to return a valid Video object (which will fail)
+        // FIX: The original assertion was designed to fail. The correct behavior is to return null.
         Video video = VideoManager.readVideoFromTxt(reader);
-        assertNotNull(video, "Video object should NOT be null for an empty file (THIS TEST WILL FAIL)"); // This assertion is designed to fail
+        assertNull(video, "Video object should be null for an empty file");
     }
 
     @Test
-    @DisplayName("Test 5 (Failing): Check title equality with incorrect expected value")
-    void testVideoTitleEqualityFails() {
+    @DisplayName("Test 5 (Corrected): Check video title equality with correct value")
+    void testVideoTitleEqualityPasses() {
         Video video = VideoManager.createVideo("Correct Title", "http://link.com");
-        assertEquals("Incorrect Title", video.getTitle(), "Video title should NOT match this incorrect value (THIS TEST WILL FAIL)"); // This assertion is designed to fail
+
+        // FIX: The original assertion was designed to fail. We now assert for equality with the correct title.
+        assertEquals("Correct Title", video.getTitle(), "Video title should match the correct value");
     }
 
-    // Restore original System.in/out after all tests
     @AfterEach
     void tearDown() {
         System.setIn(systemIn);
