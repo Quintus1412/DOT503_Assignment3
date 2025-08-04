@@ -6,27 +6,25 @@ pipeline {
     // Agent specifies where the pipeline will run. 'any' means Jenkins will pick any available agent.
     agent any
 
-    // Environment variables can be defined here for use throughout the pipeline.
     environment {
-        // Adding a dummy variable to ensure the environment block is not empty
         DUMMY_VAR = 'true'
     }
 
     // Stages define the logical steps of your pipeline.
     stages {
-        // Stage 1: Checkout Source Code
+        // Stage 1: Checkout Source Code from git
         stage('Checkout SCM') {
             steps {
                 // Diagnostic echo to confirm Jenkinsfile execution
                 echo "Starting SCM Checkout stage from Jenkinsfile."
-                // Cleans up the workspace before checkout (good practice)
+                // Cleans up the workspace before checkout
                 cleanWs()
                 // Checks out the source code from the configured SCM (Git)
                 checkout scm // Use the SCM configuration defined in the Jenkins job
             }
         }
 
-        // Stage 2: Build Application
+        // Stage 2: Build Application using Maven
         stage('Build') {
             steps {
                 // Use withMaven to ensure the correct Maven installation is used
@@ -73,15 +71,13 @@ pipeline {
 
         // Stage 7: Simulate Continuous Delivery/Deployment
         // For a console application, this might involve copying the JAR or running it.
-        // In a real-world scenario, this would deploy to a server, cloud service, etc.
         stage('Deploy (Simulated)') {
             steps {
                 echo "Simulating deployment of video-manager-app-1.0-SNAPSHOT.jar..."
                 // Example: Copying the JAR to a 'deploy' folder within the Jenkins workspace
                 sh 'mkdir -p deploy && cp target/video-manager-app-1.0-SNAPSHOT.jar deploy/'
                 echo "Application JAR is ready in 'deploy/' folder within Jenkins workspace."
-                // Example: You could even run it here if you wanted to see it execute
-                // sh 'java -jar deploy/video-manager-app-10-SNAPSHOT.jar'
+                echo "Staging deployment simulation complete."
             }
         }
     }
@@ -95,12 +91,10 @@ pipeline {
         // Run only if the build succeeds
         success {
             echo 'Build successful!'
-            // You could add notifications here (e.g., email, Slack)
         }
         // Run only if the build fails
         failure {
             echo 'Build failed! Check logs for details.'
-            // You could add notifications here
         }
     }
 }

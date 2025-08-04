@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class VideoManager {
 
     // Function to read details for a single video from user input
-    public static Video readVideo(Scanner scanner) { // Added Scanner parameter
+    public static Video readVideo(Scanner scanner) {
         System.out.print("Enter video title: ");
         String title = scanner.nextLine();
         System.out.print("Enter video link: ");
@@ -21,13 +21,13 @@ public class VideoManager {
     }
 
     // Function to add new videos to the list
-    public static void addNewVideos(List<Video> videos, Scanner scanner) { // Added Scanner parameter
+    public static void addNewVideos(List<Video> videos, Scanner scanner) {
         System.out.print("How many new videos to add? ");
         int totalNewVideos = Integer.parseInt(scanner.nextLine());
 
         for (int i = 0; i < totalNewVideos; i++) {
             System.out.println("--- Enter details for Video " + (videos.size() + 1) + " ---");
-            Video vid = readVideo(scanner); // Pass the scanner to readVideo()
+            Video vid = readVideo(scanner);
             videos.add(vid);
         }
         System.out.println(totalNewVideos + " video(s) added successfully.");
@@ -36,7 +36,7 @@ public class VideoManager {
     // Function to print details of a single video
     public static void printVideo(Video video) {
         System.out.println("--------------------");
-        System.out.println("Name of Video: " + video.getTitle()); // Modified for feature-z
+        System.out.println("Name of Video: " + video.getTitle());
         System.out.println("Link: " + video.getLink());
     }
 
@@ -78,7 +78,7 @@ public class VideoManager {
 
     // Function to read a single video from a file
     public static Video readVideoFromTxt(BufferedReader reader) throws IOException {
-        String title = reader.readLine(); // readLine() returns null at EOF
+        String title = reader.readLine();
         String link = reader.readLine();
         if (title == null || link == null) {
             return null; // Indicates end of file or incomplete entry
@@ -91,11 +91,11 @@ public class VideoManager {
         List<Video> videos = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("data.txt"))) {
             String totalLine = reader.readLine();
-            if (totalLine == null) {
+            if (totalLine == null || totalLine.trim().isEmpty()) {
                 System.out.println("\ndata.txt is empty or corrupted. Starting with an empty video list.");
                 return videos;
             }
-            int total = Integer.parseInt(totalLine);
+            int total = Integer.parseInt(totalLine.trim());
 
             for (int i = 0; i < total; i++) {
                 Video video = readVideoFromTxt(reader);
@@ -103,7 +103,7 @@ public class VideoManager {
                     videos.add(video);
                 } else {
                     System.err.println("Warning: Incomplete video entry found in data.txt. Skipping remaining entries.");
-                    break; // Break if an incomplete entry is found
+                    break;
                 }
             }
             System.out.println("\nSuccessfully loaded " + videos.size() + " video(s) from data.txt.");
@@ -130,8 +130,7 @@ public class VideoManager {
 
     public static void main(String[] args) {
         List<Video> videos = new ArrayList<>();
-        // Create a local scanner for the main method's input
-        try (Scanner scanner = new Scanner(System.in)) { // New: Scanner created here and will be auto-closed
+        try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
                 displayMenu();
                 System.out.print("Enter your choice: ");
@@ -139,7 +138,7 @@ public class VideoManager {
                     int choice = Integer.parseInt(scanner.nextLine());
                     switch (choice) {
                         case 1:
-                            addNewVideos(videos, scanner); // Pass scanner to addNewVideos
+                            addNewVideos(videos, scanner);
                             break;
                         case 2:
                             if (videos.isEmpty()) {
@@ -153,7 +152,6 @@ public class VideoManager {
                                 System.out.println("No videos to save. Please add some first.");
                             } else {
                                 writeVideosToTxt(videos);
-                                System.out.println("Videos saved to data.txt.");
                             }
                             break;
                         case 4:
@@ -165,12 +163,13 @@ public class VideoManager {
                                     continue;
                                 }
                             }
-                            videos = readVideosFromTxt(); // This still reads from file, no scanner needed
-                            System.out.println("Videos loaded from data.txt.");
+                            videos = readVideosFromTxt();
+                            // Automatically print the loaded videos
+                            printVideos(videos);
                             break;
                         case 5:
                             System.out.println("Exiting Video Manager. Goodbye!");
-                            return; // Exit the main method
+                            return;
                         default:
                             System.out.println("Invalid choice. Please enter a number between 1 and 5.");
                     }
@@ -178,8 +177,9 @@ public class VideoManager {
                     System.out.println("Invalid input. Please enter a number.");
                 }
             }
-        } // Scanner will be automatically closed here by try-with-resources
+        }
     }
+
     // New helper methods added for testability (as per unit testing guide)
     public static Video createVideo(String title, String link) {
         /** Creates and returns a Video object directly. */
